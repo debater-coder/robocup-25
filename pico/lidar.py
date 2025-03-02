@@ -7,13 +7,16 @@ HEAD_BYTE = 0xfa
 PACKET_SIZE = 22
 
 lidar_uart = UART(0, baudrate=115200, tx=Pin(0), rx=Pin(1))
-lidar_uart.init(115200, bits=8, parity=None, stop=1, flow=1)
+lidar_uart.init(115200, bits=8, parity=None, stop=1)
 lidar_motor = motor(6, 7)
 
-# start motor at max speed
-lidar_motor.speed(100)
-sleep(2)
-lidar_motor.speed(50) # slow down for PID's sake
+while True:
+    if lidar_uart.any() > 0:
+        print(lidar_uart.read(1))
+# # start motor at max speed
+# lidar_motor.speed(100)
+# sleep(2)
+# lidar_motor.speed(50) # slow down for PID's sake
 """
 # packet decoding loop
 while True:
