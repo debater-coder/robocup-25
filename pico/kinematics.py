@@ -10,51 +10,34 @@ forwards kinematics: use encoder input to determine current chassis movement
 odometry: integrate forward kinematics results over time to obtain displacement (odom transform)
 """
 from machine import Pin
+from Makerverse_Motor_2ch import motor
 import time
+import micropython
 
-ENCODER_STATES = [
-    0, -1, 1, 0,
-    1, 0, 0, -1,
-    -1, 0, 0, 1,
-    0, 1, -1, 0
-]
+micropython.alloc_emergency_exception_buf(100)
+
 
 class Encoder:
-    def __init__(self, c1, c2):
-        # Validation
-        if isinstance(c1, int):
-            c1 = Pin(c1, Pin.IN)
-        elif isinstance(c1, Pin):
-            c1.init(mode=Pin.IN)
-        else:
-            raise TypeError("Argument 'c1' must be an integer or Pin object")
-
-        if isinstance(c2, int):
-            c2 = Pin(c2, Pin.IN)
-        elif isinstance(c2, Pin):
-            c2.init(mode=Pin.IN)
-        else:
-            raise TypeError("Argument 'c2' must be an integer or Pin object")
-
+    """Encoder for motor. Uses only one encoder input as direction sensing was unreliable"""
+    def __init__(self, c1 ):
+        c1 = Pin(c1, Pin.IN, Pin.PULL_UP)
         self.c1 = c1
-        self.c2 = c2
+        self.odom = 0
+        self.direction = 1
 
-        self.speed = 0
-        self.prev_change = time.ticks_ms()
-        self.prev_state = 0
-
-        self.c1.irq()
-        self.c1.irq()
-        self.c2.irq()
-        self.c2.irq()
+        self.c1.irq(self.irq_callback, Pin.IRQ_RISING)
 
     def irq_callback(self, pin: Pin):
-        self.speed = time.ticks_diff(time.ticks_ms(), self.prev_change)
-        self.prev_change = time.ticks_ms()
+        self.odom += self.direction
 
-        # combine encoders into 1 value
-        state = self.c1.value() * 2 + self.c2.value()
+    def __str__(self) -> str:
+        return str(self.odom)
 
-        # find direction
-        self.speed *= ENCODER_STATES[self.prev_state * 4 + state]
-        self.prev_state = state
+
+encoder_rl = Encoder(11)
+encoder_rr = Encoder(13)
+encoder_fl = Encoder(19)
+encoder_fr = Encoder(21)
+
+while True:
+    print(f"rl: {encoder_rl}, rr: {encoder_rr}, fl: {encoder_fl}, fr: {encoder_fr}")
