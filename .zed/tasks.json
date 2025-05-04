@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Sync pico",
+    "command": "rshell --buffer-size=512 rsync ./pico /pyboard"
+  },
+  {
+    "label": "Micropython repl",
+    "command": "rshell --buffer-size=512 repl"
+  }
+]
