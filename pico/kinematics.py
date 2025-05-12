@@ -31,6 +31,7 @@ class Encoder:
 
     def irq_callback(self, pin: Pin):
         self.odom += self.direction
+        print("callback")
 
     def __str__(self) -> str:
         return str(self.odom)
@@ -95,21 +96,21 @@ class MotorFeedback:
 # rl = MotorFeedback(6, 7, 11, reverse=True)
 # rl.set_speed(0.5)
 
-fl = MotorFeedback(4, 5, 19, reverse=True)
-fl.set_speed(0.5)
-
-# fl = MotorFeedback(6, 7, 15)
+# fl = MotorFeedback(4, 5, 19, reverse=True)
 # fl.set_speed(0.5)
+
+fr = MotorFeedback(8, 9, 21, reverse=True)
+fr.set_speed(0.5)
 
 try:
     while True:
         # rl.update()
-        fl.update()
         # fl.update()
+        fr.update()
 except:
     # rl.motor.stop()
-    fl.motor.stop()
     # fl.motor.stop()
+    fr.motor.stop()
 # fl = MotorFeedback(6, 7, 19)
 # fr = MotorFeedback(8, 9, 21)
 
