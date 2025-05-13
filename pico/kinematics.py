@@ -93,30 +93,21 @@ class MotorFeedback:
         self.target = speed
 
 
-# rl = MotorFeedback(6, 7, 11, reverse=True)
+# rl = MotorFeedback(6, 7, 11, reverse=True) # done
 # rl.set_speed(0.5)
 
-# fl = MotorFeedback(4, 5, 19, reverse=True)
+# fl = MotorFeedback(4, 5, 19, reverse=True) # done
 # fl.set_speed(0.5)
 
-fr = MotorFeedback(8, 9, 21, reverse=True)
-fr.set_speed(0.5)
+rr = MotorFeedback(8, 9, 13) # done
+rr.set_speed(0.5)
 
 try:
     while True:
         # rl.update()
         # fl.update()
-        fr.update()
+        rr.update()
 except:
     # rl.motor.stop()
     # fl.motor.stop()
-    fr.motor.stop()
-# fl = MotorFeedback(6, 7, 19)
-# fr = MotorFeedback(8, 9, 21)
-
-# for motor in [rl, rr, fl, fr]:
-#     motor.set_speed(0.1)
-
-# while True:
-#     for motor in [rl, rr, fl, fr]:
-#         motor.update()
+    rr.motor.stop()
