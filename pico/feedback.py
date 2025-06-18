@@ -51,15 +51,15 @@ class MotorFeedback:
         self.motor_power = 0 # [-100, 100]
         self.last_time = time.ticks_us()
         self.last_error = 0
-        self.odom = 0
+        self.odom = 0.0
 
     def update(self):
-        displacement = self.encoder.odom
+        displacement = self.encoder.odom / self.ppm
         self.odom += displacement
 
         # calculate speed
         elapsed = time.ticks_diff(time.ticks_us(), self.last_time)
-        self.speed = (displacement / self.ppm) / (elapsed / 1000000)
+        self.speed = (displacement) / (elapsed / 1000000)
 
         # reset odom and time
         self.encoder.odom = 0

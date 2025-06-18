@@ -5,7 +5,6 @@
 # Initial release: FEB-14-22
 
 from machine import PWM, Pin
-import time
 
 _FORWARD = 1
 _REVERSE = 0
@@ -64,8 +63,3 @@ class Motor:
     def reverse(self):
         self.direction = _REVERSE
         self.go()
-
-    def drive(self, speed, duration_ms):
-        self.speed(speed)
-        time.sleep_ms(duration_ms)
-        self.stop()
