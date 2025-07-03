@@ -12,35 +12,28 @@ odometry: integrate forward kinematics results over time to obtain displacement 
 from feedback import MotorFeedback
 import time
 
-# stage 1: accurate movement forwards only
-# stage 2: four directions
-# stage 3: four directions + rotation
-# stage 4: pose based movement
+lx = 0.05
+ly = 0.05
+r = 0.024
+
+def inverse_kinematics(vx: float, vy: float, w: float):
+    rotation = (lx + ly) * w
+    return (
+        1/r * (vx - vy - rotation),
+        1/r * (vx + vy + rotation),
+        1/r * (vx + vy - rotation),
+        1/r * (vx - vy + rotation),
+    )
+
+def forwards_kinematics(w1: float, w2: float, w3: float, w4: float):
+    return (
+        (w1 + w2 + w3 + w4) * r/4,
+        (-w1 + w2 + w3 - w4) * r/4,
+        (-w1 + w2 - w3 + w4) * r/(4 * (lx + ly)),
+    )
 
 rl = MotorFeedback(6, 7, 11, reverse=True)
 fl = MotorFeedback(4, 5, 19, reverse=True)
 rr = MotorFeedback(8, 9, 13)
 fr = MotorFeedback(2, 3, 21)
-motors = [rl, fl, rr, fr]
-
-circumference = 3.14 * 0.048
-
-distance = float(input("Distance in m: "))
-speed = float(input("Speed (m/s)"))
-
-start = time.time()
-
-[motor.set_speed(speed / circumference) for motor in [fl, rr]]
-[motor.set_speed(-speed / circumference) for motor in [rl, fr]]
-
-while fl.odom < distance / circumference:
-    [motor.update() for motor in motors]
-
-[motor.set_speed(0) for motor in motors]
-
-end = time.time()
-
-print(f"Took {end - start}s")
-
-while True:
-    [motor.update() for motor in motors]
+motors = [fl, fr, rl, rr]
