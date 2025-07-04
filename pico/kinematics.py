@@ -32,8 +32,27 @@ def forwards_kinematics(w1: float, w2: float, w3: float, w4: float):
         (-w1 + w2 - w3 + w4) * r/(4 * (lx + ly)),
     )
 
-rl = MotorFeedback(6, 7, 11, reverse=True)
+rr = MotorFeedback(6, 7, 11)
 fl = MotorFeedback(4, 5, 19, reverse=True)
-rr = MotorFeedback(8, 9, 13)
+rl = MotorFeedback(8, 9, 13, reverse=True)
 fr = MotorFeedback(2, 3, 21)
 motors = [fl, fr, rl, rr]
+
+while True:
+    x = input("which one buddy")
+    if x ==  "rl":
+            motor = rl
+    if x ==  "fl":
+            motor = fl
+    if x ==  "rr":
+            motor = rr
+    if x ==  "fr":
+            motor = fr
+
+    motor.set_speed(1.0)
+    for i in range(1000):
+        motor.update()
+    time.sleep(2)
+    motor.set_speed(0)
+    for i in range(1000):
+        motor.update()
