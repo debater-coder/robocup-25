@@ -10,32 +10,42 @@ forward kinematics (pose estimator): use encoder input to determine current chas
 odometry: integrate forward kinematics results over time to obtain displacement (odom transform)
 """
 from feedback import MotorFeedback
-import time
 
-lx = 0.05
-ly = 0.05
-r = 0.024
+LX = 0.05  # half-length X between wheels
+LY = 0.05  # half-length Y between wheels
+R = 0.024  # radius of wheels
 
 def inverse_kinematics(vx: float, vy: float, w: float):
-    rotation = (lx + ly) * w
+    rotation = (LX + LY) * w
     return (
-        1/r * (vx - vy - rotation),
-        1/r * (vx + vy + rotation),
-        1/r * (vx + vy - rotation),
-        1/r * (vx - vy + rotation),
+        1/R * (vx - vy - rotation),
+        1/R * (vx + vy + rotation),
+        1/R * (vx + vy - rotation),
+        1/R * (vx - vy + rotation),
     )
 
 def forwards_kinematics(w1: float, w2: float, w3: float, w4: float):
     return (
-        (w1 + w2 + w3 + w4) * r/4,
-        (-w1 + w2 + w3 - w4) * r/4,
-        (-w1 + w2 - w3 + w4) * r/(4 * (lx + ly)),
+        (w1 + w2 + w3 + w4) * R/4,
+        (-w1 + w2 + w3 - w4) * R/4,
+        (-w1 + w2 - w3 + w4) * R/(4 * (LX + LY)),
     )
 
-rr = MotorFeedback(6, 7, 11)
-fl = MotorFeedback(4, 5, 19, reverse=True)
-rl = MotorFeedback(8, 9, 13, reverse=True)
-fr = MotorFeedback(2, 3, 21)
-motors = [fl, fr, rl, rr]
 
-# Input format: 3 floating point ASCII
+class Kinematics:
+    def __init__(self):
+        self.rr = MotorFeedback(6, 7, 11)
+        self.fl = MotorFeedback(4, 5, 19, reverse=True)
+        self.rl = MotorFeedback(8, 9, 13, reverse=True)
+        self.fr = MotorFeedback(2, 3, 21)
+        self.motors = [self.rr, self.fl, self.rl, self.fr]
+
+    def update(self):
+        for motor in self.motors:
+            motor.update()
+
+        # TODO: send odom to host
+
+    def set_speed(self, vx: float, vy: float, w: float):
+        for motor, speed in zip(self.motors, inverse_kinematics(vx, vy, w)):
+            motor.set_speed(speed)
