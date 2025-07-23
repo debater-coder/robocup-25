@@ -38,21 +38,4 @@ rl = MotorFeedback(8, 9, 13, reverse=True)
 fr = MotorFeedback(2, 3, 21)
 motors = [fl, fr, rl, rr]
 
-while True:
-    x = input("which one buddy")
-    if x ==  "rl":
-            motor = rl
-    if x ==  "fl":
-            motor = fl
-    if x ==  "rr":
-            motor = rr
-    if x ==  "fr":
-            motor = fr
-
-    motor.set_speed(1.0)
-    for i in range(1000):
-        motor.update()
-    time.sleep(2)
-    motor.set_speed(0)
-    for i in range(1000):
-        motor.update()
+# Input format: 3 floating point ASCII
