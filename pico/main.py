@@ -7,6 +7,5 @@ kinematics = Kinematics()
 
 while True:
     if command := command_input.poll():
-        print(command)
         kinematics.set_speed(*command)
     kinematics.update()

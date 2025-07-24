@@ -10,6 +10,7 @@ forward kinematics (pose estimator): use encoder input to determine current chas
 odometry: integrate forward kinematics results over time to obtain displacement (odom transform)
 """
 from feedback import MotorFeedback
+import time
 
 LX = 0.05  # half-length X between wheels
 LY = 0.05  # half-length Y between wheels
@@ -39,12 +40,20 @@ class Kinematics:
         self.rl = MotorFeedback(8, 9, 13, reverse=True)
         self.fr = MotorFeedback(2, 3, 21)
         self.motors = [self.fl, self.fr, self.rl, self.rr]
+        self.odom = (0, 0, 0)  # x (m), y (m), w (radians)
+        self.last_time = time.ticks_us()
 
     def update(self):
         for motor in self.motors:
             motor.update()
 
-        # TODO: send odom to host
+        elapsed = time.ticks_diff(time.ticks_us(), self.last_time) * 1e6
+        vel = forwards_kinematics(*(motor.odom for motor in self.motors))
+
+        self.last_time = time.ticks_us()  # reset timer
+
+        self.odom = tuple((odom + elapsed * component for odom, component in zip(self.odom, vel)))
+        print(" ".join(map(str, self.odom)))
 
     def set_speed(self, vx: float, vy: float, w: float):
         for motor, speed in zip(self.motors, inverse_kinematics(vx, vy, w)):
