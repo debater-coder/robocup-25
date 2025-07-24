@@ -38,7 +38,7 @@ class Kinematics:
         self.fl = MotorFeedback(4, 5, 19, reverse=True)
         self.rl = MotorFeedback(8, 9, 13, reverse=True)
         self.fr = MotorFeedback(2, 3, 21)
-        self.motors = [self.rr, self.fl, self.rl, self.fr]
+        self.motors = [self.fl, self.fr, self.rl, self.rr]
 
     def update(self):
         for motor in self.motors:

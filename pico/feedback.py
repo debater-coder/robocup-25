@@ -76,7 +76,7 @@ class MotorFeedback:
 
         # update motor
         self.motor.speed(self.motor_power * (-1 if self.reverse else 1))
-        self.encoder.direction = round(self.motor_power / abs(self.motor_power))
+        self.encoder.direction = round(self.motor_power / max(abs(self.motor_power), 1e-6))
 
     def set_speed(self, speed):
         self.target = speed
