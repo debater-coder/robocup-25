@@ -1,4 +1,4 @@
-from typing import Tuple, TypeGuard, TypeVar
+from typing import Tuple, TypeGuard
 import serial
 import warnings
 

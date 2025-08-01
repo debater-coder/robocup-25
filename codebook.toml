@@ -2,4 +2,5 @@ words = [
     "opencv",
     "pico",
     "robocup",
+    "odometry"
 ]
