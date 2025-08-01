@@ -1,9 +1,11 @@
 from typing import Protocol, Tuple
+from abc import abstractmethod
 
 
 class SupportsCommand(Protocol):
     """Protocol for controlling robot via velocity commands."""
 
+    @abstractmethod
     def send_command(self, vx: float, vy: float, vw: float) -> None:
         """Sends a velocity command to the robot (relative to the robot).
 
@@ -15,8 +17,9 @@ class SupportsCommand(Protocol):
         vy -- velocity in the y direction (+ve = left)
         vw -- angular velocity (+ve = TODO)
         """
-        ...
+        raise NotImplementedError
 
+    @abstractmethod
     def get_odometry(self) -> Tuple[float, float, float]:
         """Returns the current odometry of the robot.
 
@@ -32,4 +35,4 @@ class SupportsCommand(Protocol):
         y -- odometry n the y direction in m (+ve = left)
         w -- relative angle in radians (+ve = TODO)
         """
-        ...
+        raise NotImplementedError
