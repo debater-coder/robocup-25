@@ -1,7 +1,8 @@
-from typing import Protocol, Tuple
+from typing import Protocol, Tuple, runtime_checkable
 from abc import abstractmethod
 
 
+@runtime_checkable
 class SupportsCommand(Protocol):
     """Protocol for controlling robot via velocity commands."""
 

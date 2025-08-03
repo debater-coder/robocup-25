@@ -2,5 +2,9 @@ words = [
     "opencv",
     "pico",
     "robocup",
-    "odometry"
+    "odometry",
+    "behaviour",
+    "localisation",
+    "initialise",
+    "Initialised"
 ]
