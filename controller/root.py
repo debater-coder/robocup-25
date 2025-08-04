@@ -1,4 +1,5 @@
 import py_trees
+import numpy as np
 
 from behaviours import VelocityControl
 
@@ -14,6 +15,12 @@ def create_root() -> py_trees.behaviour.Behaviour:
 
     This is kept in its own method so it can be used to generate diagrams with py-trees-render
     """
+    # Blackboard static initialisation
+    blackboard = py_trees.blackboard.Client(name="Global")
+    blackboard.register_key("target_vel", access=py_trees.common.Access.WRITE)
+    blackboard.target_vel = np.array([0.0, 0.0, 0.0])
+
+    # Tree building
     root = py_trees.composites.Parallel(
         name="Robocup Controller",
         policy=py_trees.common.ParallelPolicy.SuccessOnAll(synchronise=False),

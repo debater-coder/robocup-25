@@ -16,7 +16,7 @@ class SupportsCommand(Protocol):
         Arguments:
         vx -- velocity in the x direction (+ve = forwards)
         vy -- velocity in the y direction (+ve = left)
-        vw -- angular velocity (+ve = TODO)
+        vw -- angular velocity (+ve = anticlockwise)
         """
         raise NotImplementedError
 
@@ -34,6 +34,6 @@ class SupportsCommand(Protocol):
         Return value (tuple[x, y, w]):
         x -- odometry in the x direction in m (+ve = forwards)
         y -- odometry n the y direction in m (+ve = left)
-        w -- relative angle in radians (+ve = TODO)
+        w -- relative angle in radians (+ve = anticlockwise)
         """
         raise NotImplementedError

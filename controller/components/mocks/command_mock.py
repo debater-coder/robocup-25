@@ -4,7 +4,7 @@ import time
 
 class CommandMock:
     def __init__(self) -> None:
-        self.odom = np.array([0, 0, 0])
+        self.odom = np.array([0.0, 0.0, 0.0])
         self.vx = 0
         self.vy = 0
         self.vw = 0

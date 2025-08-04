@@ -11,12 +11,16 @@ edge [fontname="times-roman"];
 Localisation [label=Localisation, shape=ellipse, style=filled, fillcolor=gray, fontsize=9, fontcolor=black];
 "Robocup Controller" -> Localisation;
 "/target_vel" -> "Velocity Control" [color=green, constraint=false, weight=0];
+Global -> "/target_vel" [color=blue, constraint=false, weight=0];
 "Velocity Control" -> "/odom" [color=blue, constraint=false, weight=0];
+"Velocity Control" -> "/vel" [color=blue, constraint=false, weight=0];
 subgraph Blackboard {
 id=Blackboard;
 label=Blackboard;
 rank=sink;
-"/target_vel" [label="/target_vel: -", shape=box, style=filled, color=blue, fillcolor=white, fontsize=8, fontcolor=blue, width=0, height=0, fixedsize=false];
-"/odom" [label="/odom: -", shape=box, style=filled, color=blue, fillcolor=white, fontsize=8, fontcolor=blue, width=0, height=0, fixedsize=false];
+Global [label=Global, shape=ellipse, style=filled, color=blue, fillcolor=gray, fontsize=7, fontcolor=blue];
+"/target_vel" [label="/target_vel: [0. 0. 0.]", shape=box, style=filled, color=blue, fillcolor=white, fontsize=8, fontcolor=blue, width=0, height=0, fixedsize=false];
+"/odom" [label="/odom: [0 0 0]", shape=box, style=filled, color=blue, fillcolor=white, fontsize=8, fontcolor=blue, width=0, height=0, fixedsize=false];
+"/vel" [label="/vel: [0 0 0]", shape=box, style=filled, color=blue, fillcolor=white, fontsize=8, fontcolor=blue, width=0, height=0, fixedsize=false];
 }
 }
