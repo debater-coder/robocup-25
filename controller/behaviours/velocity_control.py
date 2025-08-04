@@ -55,14 +55,14 @@ class VelocityControl(py_trees.behaviour.Behaviour):
         if "command" in kwargs and isinstance(
             command := kwargs["command"], SupportsCommand
         ):
+            # set initial odometry
+            self.blackboard.odom = command.get_odometry()
+            self.last_time = time.time()
+
             self.command = command
             self.logger.info(f"Initialised with command: {command}")
         else:
             raise TypeError("Expected command to be passed in VelocityControl.setup()")
-
-    def initialise(self) -> None:
-        # We do this to reset the elapsed time the first time behaviour is ticked
-        self.last_time = time.time()
 
     def get_odometry(self):
         if not self.command:
@@ -100,3 +100,7 @@ class VelocityControl(py_trees.behaviour.Behaviour):
         self.send_command(vx, vy, vw)
 
         return py_trees.common.Status.RUNNING
+
+    def terminate(self, new_status: py_trees.common.Status) -> None:
+        """Safely stop motors on termination."""
+        self.send_command(0, 0, 0)
