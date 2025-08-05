@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -69,6 +71,14 @@ function App() {
     <>
       <h1 className="text-2xl">Field view</h1>
       <canvas width="2430" height="1820" ref={canvasRef} className="w-2xl" />
+      <div className="flex gap-2">
+        <Input type="number" placeholder="Velocity X (m/s)" />
+        <Input type="number" placeholder="Velocity Y (m/s)" />
+        <Input type="number" placeholder="Angular velocity (rad/s)" />
+        <Button type="submit" variant="outline">
+          Send velocity command
+        </Button>
+      </div>
     </>
   );
 }
