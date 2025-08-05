@@ -12,6 +12,7 @@ Localisation [label=Localisation, shape=ellipse, style=filled, fillcolor=gray, f
 "Robocup Controller" -> Localisation;
 "/target_vel" -> "Velocity Control" [color=green, constraint=false, weight=0];
 Global -> "/target_vel" [color=blue, constraint=false, weight=0];
+"/odom" -> Localisation [color=green, constraint=false, weight=0];
 "Velocity Control" -> "/odom" [color=blue, constraint=false, weight=0];
 "Velocity Control" -> "/vel" [color=blue, constraint=false, weight=0];
 subgraph Blackboard {

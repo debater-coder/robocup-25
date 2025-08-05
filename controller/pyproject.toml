@@ -11,5 +11,6 @@ dependencies = [
     "py-trees>=2.3.0",
     "pyserial>=3.5",
     "scipy>=1.16.1",
+    "scipy-stubs>=1.16.1.0",
     "types-pyserial>=3.5.0.20250801",
 ]

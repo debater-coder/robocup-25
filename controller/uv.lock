@@ -13,6 +13,7 @@ dependencies = [
     { name = "py-trees" },
     { name = "pyserial" },
     { name = "scipy" },
+    { name = "scipy-stubs" },
     { name = "types-pyserial" },
 ]
 
@@ -24,6 +25,7 @@ requires-dist = [
     { name = "py-trees", specifier = ">=2.3.0" },
     { name = "pyserial", specifier = ">=3.5" },
     { name = "scipy", specifier = ">=1.16.1" },
+    { name = "scipy-stubs", specifier = ">=1.16.1.0" },
     { name = "types-pyserial", specifier = ">=3.5.0.20250801" },
 ]
 
@@ -66,6 +68,18 @@ wheels = [
 ]
 
 [[package]]
+name = "numpy-typing-compat"
+version = "2.2.20250730"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c5/0e/639afa67a8f6296ba0f2aa16530faf5c7fc4606bffda612b66aff26d898a/numpy_typing_compat-2.2.20250730.tar.gz", hash = "sha256:f6b9a08193c6291c3d6c4717d1ee1b0a8bf5050765165175affde7afaab1639f", size = 4711, upload-time = "2025-07-30T01:36:11.717Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/f3/43a2cf394d3a710b4fb21dc0e65b165080581d7b5352269d93e54a726c4a/numpy_typing_compat-2.2.20250730-py3-none-any.whl", hash = "sha256:7d7639eafb5bc399650ae6d4baf441dfa0a40eb06965fd85e7f6d4dfe2e34ff7", size = 6059, upload-time = "2025-07-30T01:36:04.763Z" },
+]
+
+[[package]]
 name = "opencv-python"
 version = "4.12.0.88"
 source = { registry = "https://pypi.org/simple" }
@@ -80,6 +94,24 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/68/1f/795e7f4aa2eacc59afa4fb61a2e35e510d06414dd5a802b51a012d691b37/opencv_python-4.12.0.88-cp37-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:092c16da4c5a163a818f120c22c5e4a2f96e0db4f24e659c701f1fe629a690f9", size = 67041680, upload-time = "2025-07-07T09:14:01.995Z" },
     { url = "https://files.pythonhosted.org/packages/02/96/213fea371d3cb2f1d537612a105792aa0a6659fb2665b22cad709a75bd94/opencv_python-4.12.0.88-cp37-abi3-win32.whl", hash = "sha256:ff554d3f725b39878ac6a2e1fa232ec509c36130927afc18a1719ebf4fbf4357", size = 30284131, upload-time = "2025-07-07T09:14:08.819Z" },
     { url = "https://files.pythonhosted.org/packages/fa/80/eb88edc2e2b11cd2dd2e56f1c80b5784d11d6e6b7f04a1145df64df40065/opencv_python-4.12.0.88-cp37-abi3-win_amd64.whl", hash = "sha256:d98edb20aa932fd8ebd276a72627dad9dc097695b3d435a4257557bbb49a79d2", size = 39000307, upload-time = "2025-07-07T09:14:16.641Z" },
+]
+
+[[package]]
+name = "optype"
+version = "0.13.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4b/b5/c295280c848a622e402d1f4c329d0f4d8055e281a140d3ca52aa8eda462d/optype-0.13.1.tar.gz", hash = "sha256:9b1d590597b0c093faf5253e38238c5a5e1a1f9afb04530836c38ac94fdd5cf6", size = 99030, upload-time = "2025-07-30T12:52:49.941Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/0f/35fd26222a48cb4601c62616f992586b39fdcb963bd362bbeec435f81355/optype-0.13.1-py3-none-any.whl", hash = "sha256:811c6b4c3d40e10b6602e33a546b30b5e595e9ec7c59e050b5e328332ed2659c", size = 87632, upload-time = "2025-07-30T12:52:48.334Z" },
+]
+
+[package.optional-dependencies]
+numpy = [
+    { name = "numpy" },
+    { name = "numpy-typing-compat" },
 ]
 
 [[package]]
@@ -204,10 +236,31 @@ wheels = [
 ]
 
 [[package]]
+name = "scipy-stubs"
+version = "1.16.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "optype", extra = ["numpy"] },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e5/27/bc9a81cabc1cb24aca77d221d70e9d62677b984da9a20292511b80183895/scipy_stubs-1.16.1.0.tar.gz", hash = "sha256:4251c10d0a0a47b54916c49f62cc7b411ab0f7b78ea3946a156990110982d6d9", size = 344964, upload-time = "2025-08-01T02:41:57.245Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/1b/9afd7b859c3067845631c65bff8a1ffa59de122e0af121ff17c476f625cd/scipy_stubs-1.16.1.0-py3-none-any.whl", hash = "sha256:6ce677a485391012cbcc0e28897b5dd6031a1b5dda40b2ceecbbc5d4f9cc03d5", size = 551168, upload-time = "2025-08-01T02:41:55.387Z" },
+]
+
+[[package]]
 name = "types-pyserial"
 version = "3.5.0.20250801"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fb/4a/171d6b42ac7f160603f6ab4dbaa44f4e5435ba0be6aa357ca5003ab9cff2/types_pyserial-3.5.0.20250801.tar.gz", hash = "sha256:a241cf042e44681bdf4d9274907cd3a315b1a40f18e6cdac9a488aa81fd3f059", size = 19712, upload-time = "2025-08-01T03:48:08.319Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/ad/e71813bf4c32777d03ddef1167d184e468e890d92ddd0da7877c4af892fa/types_pyserial-3.5.0.20250801-py3-none-any.whl", hash = "sha256:57ad3474199e78257f75746b748e56c32ff647fb07f7e1fba78202bb17cb0c82", size = 25304, upload-time = "2025-08-01T03:48:07.163Z" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.14.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/5a/da40306b885cc8c09109dc2e1abd358d5684b1425678151cdaed4731c822/typing_extensions-4.14.1.tar.gz", hash = "sha256:38b39f4aeeab64884ce9f74c94263ef78f3c22467c8724005483154c26648d36", size = 107673, upload-time = "2025-07-04T13:28:34.16Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b5/00/d631e67a838026495268c2f6884f3711a15a9a2a96cd244fdaea53b823fb/typing_extensions-4.14.1-py3-none-any.whl", hash = "sha256:d1e1e3b58374dc93031d6eda2420a48ea44a36c2b4766a4fdeb3710755731d76", size = 43906, upload-time = "2025-07-04T13:28:32.743Z" },
 ]

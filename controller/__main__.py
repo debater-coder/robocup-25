@@ -3,6 +3,7 @@ import py_trees
 import sys
 
 from components.mocks.command_mock import CommandMock
+from components.robocup_posetree import RobocupPoseTree
 from interfaces.command import SupportsCommand
 from root import create_root
 
@@ -24,8 +25,9 @@ def create_tree() -> py_trees.trees.BehaviourTree:
     tree = py_trees.trees.BehaviourTree(root)
 
     command: SupportsCommand = CommandMock()
+    posetree = RobocupPoseTree()
 
-    tree.setup(timeout=15, command=command)
+    tree.setup(timeout=15, command=command, posetree=posetree)
     return tree
 
 
