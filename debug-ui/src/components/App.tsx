@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -114,19 +114,57 @@ function App() {
     };
   }, []);
 
+  const [robot1, setRobot1] = useState("");
+  const [x, setX] = useState(0);
+  const [y, setY] = useState(0);
+  const [w, setW] = useState(0);
+
   return (
-    <>
+    <div className="flex flex-col gap-2">
       <h1 className="text-2xl">Field view</h1>
       <canvas width="2430" height="1820" ref={canvasRef} className="w-2xl" />
+      <Input
+        value={robot1}
+        onChange={(e) => setRobot1(e.target.value)}
+        type="url"
+        placeholder="Robot 1 Debug URI"
+      />
       <div className="flex gap-2">
-        <Input type="number" placeholder="Velocity X (m/s)" />
-        <Input type="number" placeholder="Velocity Y (m/s)" />
-        <Input type="number" placeholder="Angular velocity (rad/s)" />
-        <Button type="submit" variant="outline">
+        <Input
+          value={x}
+          onChange={(e) => setX(parseFloat(e.target.value))}
+          type="number"
+          placeholder="Velocity X (m/s)"
+        />
+        <Input
+          value={y}
+          onChange={(e) => setY(parseFloat(e.target.value))}
+          type="number"
+          placeholder="Velocity Y (m/s)"
+        />
+        <Input
+          value={w}
+          onChange={(e) => setW(parseFloat(e.target.value))}
+          type="number"
+          placeholder="Angular velocity (rad/s)"
+        />
+        <Button
+          type="submit"
+          variant="outline"
+          onClick={() => {
+            fetch(robot1 + "/target_vel", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json;charset=utf-8",
+              },
+              body: JSON.stringify({ x, y, w }),
+            });
+          }}
+        >
           Send velocity command
         </Button>
       </div>
-    </>
+    </div>
   );
 }
 
