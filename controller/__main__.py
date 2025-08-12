@@ -1,11 +1,14 @@
 import argparse
 import py_trees
 import sys
+import time
 
 from components.mocks.command_mock import CommandMock
 from components.robocup_posetree import RobocupPoseTree
+
 from interfaces.command import SupportsCommand
 from root import create_root
+
 
 parser = argparse.ArgumentParser(
     prog="Robocup controller",
@@ -31,14 +34,20 @@ def create_tree() -> py_trees.trees.BehaviourTree:
     return tree
 
 
+last_log = time.time()
+
+
 def post_tick(tree):
-    print(
-        py_trees.display.unicode_tree(
-            tree.root,
-        ),
-        py_trees.display.unicode_blackboard(),
-    )
+    global last_log
+
+    if time.time() - last_log < 3:
+        return
+
+    last_log = time.time()
+
+    print(py_trees.display.unicode_blackboard())
 
 
+py_trees.blackboard.Blackboard.enable_activity_stream(maximum_size=100)
 tree = create_tree()
 tree.tick_tock(period_ms=16, post_tick_handler=post_tick)

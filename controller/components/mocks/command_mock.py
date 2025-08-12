@@ -11,9 +11,9 @@ class CommandMock:
         self.last_time = time.time()
 
     def send_command(self, vx: float, vy: float, vw: float):
-        self.vx = vx
-        self.vy = vy
-        self.vw = vw
+        self.vx = min(1, max(-1, vx))
+        self.vy = min(1, max(-1, vy))
+        self.vw = min(1, max(-1, vw))
 
     def get_odometry(self):
         elapsed = time.time() - self.last_time

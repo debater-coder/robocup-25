@@ -17,7 +17,7 @@ class PDControl:
 
     def update(self, error: float, delta: float) -> float:
         proportional = error * self.kp
-        derivative = (error - self.error_prev) / delta * self.kd
+        derivative = -(error - self.error_prev) / delta * self.kd
 
         self.error_prev = error
 
@@ -45,9 +45,9 @@ class VelocityControl(py_trees.behaviour.Behaviour):
 
         # Separate PD controllers for each axis
         self.controls = [
-            PDControl(kp=1, kd=0.1),  # x
-            PDControl(kp=1, kd=0.1),  # y
-            PDControl(kp=1, kd=0.1),  # w
+            PDControl(kp=1, kd=0.01),  # x
+            PDControl(kp=1, kd=0.01),  # y
+            PDControl(kp=1, kd=0.01),  # w
         ]
 
     def setup(self, **kwargs: typing.Any) -> None:
