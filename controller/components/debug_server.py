@@ -4,8 +4,6 @@ import aiohttp_cors
 from multiprocessing import Queue
 import asyncio
 
-import posetree
-
 
 def debug_sever(
     target_vel_queue: Queue[tuple[float, float, float]],

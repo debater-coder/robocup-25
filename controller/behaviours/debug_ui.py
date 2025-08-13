@@ -1,5 +1,7 @@
 from multiprocessing import Process, Queue
 import queue
+
+from posetree import Pose, PoseTree, Transform
 from components.debug_server import debug_sever
 import py_trees
 import numpy as np
@@ -14,11 +16,20 @@ class DebugUI(py_trees.behaviour.Behaviour):
         self.blackboard.register_key(
             "target_vel", access=py_trees.common.Access.WRITE, required=True
         )
+
+        self.blackboard.register_key(
+            "posetree", access=py_trees.common.Access.READ, required=True
+        )
+
         self.target_vel_queue: Queue[tuple[float, float, float]] = Queue()
+        self.pose_queue: Queue[tuple[float, float, float]] = Queue()
 
     def setup(self, **kwargs):
         self.target_vel_queue: Queue[tuple[float, float, float]] = Queue()
-        self.process = Process(target=debug_sever, args=(self.target_vel_queue,))
+        self.pose_queue: Queue[tuple[float, float, float]] = Queue()
+        self.process = Process(
+            target=debug_sever, args=(self.target_vel_queue, self.pose_queue)
+        )
         self.process.start()
 
     def update(self) -> py_trees.common.Status:
@@ -27,6 +38,11 @@ class DebugUI(py_trees.behaviour.Behaviour):
             self.blackboard.target_vel = np.array(vel)
         except queue.Empty:
             pass
+
+        posetree: PoseTree = self.blackboard.posetree
+        chassis = Pose(Transform.identity(), "chassis", posetree).in_frame("field")
+
+        self.pose_queue.put((chassis.x, chassis.y, chassis.rotation.as_euler("zyx")[0]))
 
         return py_trees.common.Status.RUNNING
 
