@@ -1,6 +1,42 @@
+from multiprocessing.queues import Queue
 from typing import Tuple, TypeGuard
-import serial
 import warnings
+import queue
+
+command_queue: Queue[tuple[float, float, float]] = Queue()
+odom_queue: Queue[tuple[float, float, float]] = Queue()
+
+
+def serial_process(dev: str):
+    import serial
+
+    port = serial.Serial(dev, 115200)
+
+    # Reset port (^C^D)
+    port.write(b"\x03\x04")
+
+    pending = ""
+
+    while True:
+        # send command (don't block on waiting for command)
+        if not command_queue.empty():
+            vx, vy, vw = command_queue.get()
+            port.write(f"{vx} {vy} {vw}\n".encode())
+
+        # receive odom (MCU is spamming it anyway so ok to block)
+        line = port.readline().decode()
+        if line:
+            if line[-1] == "\n":
+                odometry = tuple(map(float, (pending + line).split()))
+
+                if not is_three_element_tuple(odometry):
+                    warnings.warn("Failed to parse odometry")
+                    continue
+                pending = ""
+
+                odom_queue.put(odometry)
+            else:
+                pending = line
 
 
 def is_three_element_tuple[T](val: Tuple[T, ...]) -> TypeGuard[tuple[T, T, T]]:
@@ -13,34 +49,23 @@ class SerialCommand:
     Implements :py:class:`interfaces.SupportsCommand`"""
 
     def __init__(self, port: str = "/dev/ttyACM0"):
-        self.port = serial.Serial(port, 115200, timeout=0)  # non-blocking
-
-        # Reset port (^C^D)
-        self.port.write(b"\x03\x04")
-
-        self.pending = ""
         self.odometry: Tuple[float, float, float] = (0, 0, 0)
-
         self.prev_command = None
 
     def send_command(self, vx: float, vy: float, vw: float):
         if self.prev_command != (vx, vy, vw):
-            self.port.write(f"{vx} {vy} {vw}\n".encode())
+            command_queue.put((vx, vy, vw))
         self.prev_command = (vx, vy, vw)
 
     def get_odometry(self):
-        line = self.port.readline().decode()
-        if line:
-            if line[-1] == "\n":
-                odometry = tuple(map(float, (self.pending + line).split()))
+        item = None
+        while True:
+            try:
+                item = odom_queue.get_nowait()
+            except queue.Empty:
+                break
 
-                if not is_three_element_tuple(odometry):
-                    warnings.warn("Failed to parse odometry")
-                    return self.odometry
-
-                self.odometry = odometry
-                self.pending = ""
-            else:
-                self.pending = line
+        if item:
+            self.odometry = item
 
         return self.odometry
