@@ -15,8 +15,8 @@ export class Robot {
   onmessage = (event: MessageEvent) => {
     const msg = JSON.parse(event.data);
 
-    this.x = msg.x * 1000;
-    this.y = msg.y * 1000;
+    this.x = msg.x;
+    this.y = msg.y;
     this.angle = msg.w;
 
     this.callback?.();
@@ -26,6 +26,9 @@ export class Robot {
     this.socket.close();
   }
 }
+
+const WIDTH = 2430;
+const HEIGHT = 1820;
 
 export class FieldCanvas {
   ctx: CanvasRenderingContext2D;
@@ -55,7 +58,7 @@ export class FieldCanvas {
 
   drawRobot({ x, y, angle }: Robot) {
     this.ctx.save();
-    this.ctx.translate(x, y);
+    this.ctx.translate(x * 1000 + WIDTH / 2, y * 1000 + HEIGHT / 2);
     this.ctx.rotate(angle);
 
     // Robot
@@ -75,32 +78,30 @@ export class FieldCanvas {
   }
 
   draw = () => {
-    const width = 2430;
-    const height = 1820;
     // Green background (whole field)
     this.ctx.fillStyle = "#37700C";
-    this.ctx.fillRect(0, 0, width, height);
+    this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
     // Neutral points
     const neutral_point = (x: number, y: number) =>
       this.circle(x, y, 15, "black");
 
-    neutral_point(width / 2, height / 2 - 300);
-    neutral_point(width / 2, height / 2);
-    neutral_point(width / 2, height / 2 + 300);
+    neutral_point(WIDTH / 2, HEIGHT / 2 - 300);
+    neutral_point(WIDTH / 2, HEIGHT / 2);
+    neutral_point(WIDTH / 2, HEIGHT / 2 + 300);
 
     // Penalty boxes
     this.ctx.strokeStyle = "#000000";
     this.ctx.lineWidth = 25;
     this.ctx.strokeRect(
       250 + 25 / 2,
-      height / 2 - 900 / 2 + 25 / 2,
+      HEIGHT / 2 - 900 / 2 + 25 / 2,
       300 - 25 / 2,
       900 - 25 / 2,
     );
     this.ctx.strokeRect(
-      width - 250 - 300,
-      height / 2 - 900 / 2 + 25 / 2,
+      WIDTH - 250 - 300,
+      HEIGHT / 2 - 900 / 2 + 25 / 2,
       300 - 25 / 2,
       900 - 25 / 2,
     );
@@ -112,15 +113,15 @@ export class FieldCanvas {
     this.ctx.strokeRect(
       outerOffset,
       outerOffset,
-      width - 2 * outerOffset,
-      height - 2 * outerOffset,
+      WIDTH - 2 * outerOffset,
+      HEIGHT - 2 * outerOffset,
     );
 
     // Goals
     this.ctx.fillStyle = "cyan";
-    this.ctx.fillRect(300 - 74, (height - 450) / 2, 74, 450);
+    this.ctx.fillRect(300 - 74, (HEIGHT - 450) / 2, 74, 450);
     this.ctx.fillStyle = "yellow";
-    this.ctx.fillRect(width - 300, (height - 450) / 2, 74, 450);
+    this.ctx.fillRect(WIDTH - 300, (HEIGHT - 450) / 2, 74, 450);
 
     this.robots.forEach((robot) => this.drawRobot(robot));
   };
