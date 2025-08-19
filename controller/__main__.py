@@ -4,6 +4,7 @@ import sys
 import time
 
 from components.mocks.command_mock import CommandMock
+from components.serial_command import SerialCommand
 from components.robocup_posetree import RobocupPoseTree
 
 from interfaces.command import SupportsCommand
@@ -15,9 +16,11 @@ parser = argparse.ArgumentParser(
     description="Controls a single Raspberry Pi to execute Robocup strategy.",
 )
 parser.add_argument("-r", "--render", action="store_true")
+parser.add_argument("-s", "--sim", action="store_true")
+parser.add_argument("-d", "--debug", action="store_true")
 args = parser.parse_args()
 
-root = create_root()
+root = create_root(args.debug)
 
 if args.render:
     py_trees.display.render_dot_tree(root, with_blackboard_variables=True)
@@ -27,7 +30,7 @@ if args.render:
 def create_tree() -> py_trees.trees.BehaviourTree:
     tree = py_trees.trees.BehaviourTree(root)
 
-    command: SupportsCommand = CommandMock()
+    command: SupportsCommand = SerialCommand() if args.sim else CommandMock()
     posetree = RobocupPoseTree()
 
     tree.setup(timeout=15, command=command, posetree=posetree)

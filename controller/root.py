@@ -6,7 +6,7 @@ from behaviours.debug_ui import DebugUI
 from behaviours.localisation import Localisation
 
 
-def create_root() -> py_trees.behaviour.Behaviour:
+def create_root(debug: bool) -> py_trees.behaviour.Behaviour:
     """
     Creates a behaviour tree for controlling the state of a single robot.
 
@@ -32,8 +32,10 @@ def create_root() -> py_trees.behaviour.Behaviour:
     velocity_control = VelocityControl(name="Velocity Control")
     vision = py_trees.behaviours.Running(name="Vision Processing")  # placeholder
     localisation = Localisation(name="Localisation")
-    debug_ui = DebugUI(name="Debug UI server")
 
-    root.add_children([velocity_control, vision, localisation, debug_ui])
+    root.add_children([velocity_control, vision, localisation])
+    if debug:
+        debug_ui = DebugUI(name="Debug UI server")
+        root.add_child(debug_ui)
 
     return root
