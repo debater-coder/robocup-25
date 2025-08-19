@@ -9,6 +9,7 @@ PID control loop: use encoder input to keep motor speeds close to calculated spe
 forward kinematics (pose estimator): use encoder input to determine current chassis movement
 odometry: integrate forward kinematics results over time to obtain displacement (odom transform)
 """
+
 from feedback import MotorFeedback
 import math
 
@@ -20,29 +21,31 @@ CALIBRATION_X = 1.98 / 0.3256874
 CALIBRATION_Y = 1.03 / 0.2719314
 CALIBRATION_W = 6.28 / 1.23
 
+
 def inverse_kinematics(vx: float, vy: float, w: float):
     rotation = (LX + LY) * w
     return (
-        1/R * (vx - vy - rotation),
-        1/R * (vx + vy + rotation),
-        1/R * (vx + vy - rotation),
-        1/R * (vx - vy + rotation),
+        1 / R * (vx - vy - rotation),
+        1 / R * (vx + vy + rotation),
+        1 / R * (vx + vy - rotation),
+        1 / R * (vx - vy + rotation),
     )
+
 
 def forwards_kinematics(w1: float, w2: float, w3: float, w4: float):
     return (
-        (w1 + w2 + w3 + w4) * R/4,
-        (-w1 + w2 + w3 - w4) * R/4,
-        (-w1 + w2 - w3 + w4) * R/(4 * (LX + LY)),
+        (w1 + w2 + w3 + w4) * R / 4,
+        (-w1 + w2 + w3 - w4) * R / 4,
+        (-w1 + w2 - w3 + w4) * R / (4 * (LX + LY)),
     )
 
 
 class Kinematics:
     def __init__(self):
-        self.rr = MotorFeedback(6, 7, 11)
-        self.fl = MotorFeedback(4, 5, 19, reverse=True)
-        self.rl = MotorFeedback(8, 9, 13, reverse=True)
-        self.fr = MotorFeedback(2, 3, 21)
+        self.fl = MotorFeedback(2, 3, 11, reverse=True)
+        self.rl = MotorFeedback(4, 5, 13)
+        self.rr = MotorFeedback(6, 7, 21, reverse=True)
+        self.fr = MotorFeedback(8, 9, 19)
         self.motors = [self.fl, self.fr, self.rl, self.rr]
         self.odom = (0, 0, 0)  # x (m), y (m), w (radians)
 
@@ -54,7 +57,11 @@ class Kinematics:
         for motor in self.motors:
             motor.odom = 0
 
-        self.odom = (self.odom[0] + disp[0] * CALIBRATION_X, self.odom[1] + disp[1] * CALIBRATION_Y, self.odom[2] + disp[2] * CALIBRATION_W)
+        self.odom = (
+            self.odom[0] + disp[0] * CALIBRATION_X,
+            self.odom[1] + disp[1] * CALIBRATION_Y,
+            self.odom[2] + disp[2] * CALIBRATION_W,
+        )
         print(" ".join(map(str, self.odom)))
 
     def set_speed(self, vx: float, vy: float, w: float):
