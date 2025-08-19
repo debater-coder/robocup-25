@@ -33,7 +33,7 @@ class MotorFeedback:
         dir: int,
         encoder: int,
         pulses_per_revolution: int = 1050,
-        kp: float = 50,
+        kp: float = 10,
         ki: float = 0,
         kd: float = 0,
         reverse=False,
