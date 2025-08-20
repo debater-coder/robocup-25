@@ -15,7 +15,8 @@ def serial_process(dev: str):
 
     # Reset port (^C^D)
     port.write(b"\x03\x04")
-    port.readall()
+    for i in range(50):
+        port.readline()
 
     pending = ""
 
@@ -24,20 +25,24 @@ def serial_process(dev: str):
         if not command_queue.empty():
             vx, vy, vw = command_queue.get()
             port.write(f"{vx} {vy} {vw}\n".encode())
-            port.readall()
+            for i in range(50):
+                port.readline()
 
         # receive odom (MCU is spamming it anyway so ok to block)
         line = port.readline().decode()
         if line:
             if line[-1] == "\n":
-                odometry = tuple(map(float, (pending + line).split()))
+                try:
+                    odometry = tuple(map(float, (pending + line).split()))
 
-                if not is_three_element_tuple(odometry):
+                    if not is_three_element_tuple(odometry):
+                        raise ValueError
+                    odom_queue.put(odometry)
+                except (ValueError, TypeError):
                     warnings.warn("Failed to parse odometry")
-                    continue
-                pending = ""
+                finally:
+                    pending = ""
 
-                odom_queue.put(odometry)
             else:
                 pending = line
 
