@@ -1,14 +1,15 @@
 from __future__ import annotations
-from multiprocessing import Queue
+from multiprocessing import Process, Queue
 from typing import Tuple, TypeGuard
 import warnings
 import queue
 
-command_queue: Queue[tuple[float, float, float]] = Queue()
-odom_queue: Queue[tuple[float, float, float]] = Queue()
 
-
-def serial_process(dev: str):
+def serial_process(
+    dev: str,
+    command_queue: Queue[tuple[float, float, float]],
+    odom_queue: Queue[tuple[float, float, float]],
+):
     import serial
 
     port = serial.Serial(dev, 115200)
@@ -60,16 +61,24 @@ class SerialCommand:
         self.odometry: Tuple[float, float, float] = (0, 0, 0)
         self.prev_command = None
 
+        self.command_queue: Queue[tuple[float, float, float]] = Queue()
+        self.odom_queue: Queue[tuple[float, float, float]] = Queue()
+
+        self.process = Process(
+            target=serial_process, args=(port, self.command_queue, self.odom_queue)
+        )
+        self.process.start()
+
     def send_command(self, vx: float, vy: float, vw: float):
         if self.prev_command != (vx, vy, vw):
-            command_queue.put((vx, vy, vw))
+            self.command_queue.put((vx, vy, vw))
         self.prev_command = (vx, vy, vw)
 
     def get_odometry(self):
         item = None
         while True:
             try:
-                item = odom_queue.get_nowait()
+                item = self.odom_queue.get_nowait()
             except queue.Empty:
                 break
 
