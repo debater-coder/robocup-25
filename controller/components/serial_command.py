@@ -1,3 +1,4 @@
+from __future__ import annotations
 from multiprocessing import Queue
 from typing import Tuple, TypeGuard
 import warnings
