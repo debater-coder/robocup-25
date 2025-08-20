@@ -1,4 +1,4 @@
-from multiprocessing.queues import Queue
+from multiprocessing import Queue
 from typing import Tuple, TypeGuard
 import warnings
 import queue
