@@ -15,6 +15,7 @@ def serial_process(dev: str):
 
     # Reset port (^C^D)
     port.write(b"\x03\x04")
+    port.readall()
 
     pending = ""
 
@@ -23,6 +24,7 @@ def serial_process(dev: str):
         if not command_queue.empty():
             vx, vy, vw = command_queue.get()
             port.write(f"{vx} {vy} {vw}\n".encode())
+            port.readall()
 
         # receive odom (MCU is spamming it anyway so ok to block)
         line = port.readline().decode()
