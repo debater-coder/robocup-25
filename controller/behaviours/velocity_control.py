@@ -45,9 +45,9 @@ class VelocityControl(py_trees.behaviour.Behaviour):
 
         # Separate PD controllers for each axis
         self.controls = [
-            PDControl(kp=0.1, kd=0.01),  # x
-            PDControl(kp=0.1, kd=0.01),  # y
-            PDControl(kp=0.1, kd=0.01),  # w
+            PDControl(kp=0.05, kd=0),  # x
+            PDControl(kp=0.05, kd=0),  # y
+            PDControl(kp=0.05, kd=0),  # w
         ]
 
     def setup(self, **kwargs: typing.Any) -> None:

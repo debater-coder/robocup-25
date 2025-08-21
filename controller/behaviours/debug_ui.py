@@ -21,14 +21,20 @@ class DebugUI(py_trees.behaviour.Behaviour):
             "posetree", access=py_trees.common.Access.READ, required=True
         )
 
+        self.blackboard.register_key(
+            "vel", access=py_trees.common.Access.READ, required=True
+        )
+
         self.target_vel_queue: Queue[tuple[float, float, float]] = Queue()
         self.pose_queue: Queue[tuple[float, float, float]] = Queue()
+        self.vel_queue: Queue[tuple[float, float, float]] = Queue()
 
     def setup(self, **kwargs):
         self.target_vel_queue: Queue[tuple[float, float, float]] = Queue()
         self.pose_queue: Queue[tuple[float, float, float]] = Queue()
+        self.vel_queue: Queue[tuple[float, float, float]] = Queue()
         self.process = Process(
-            target=debug_sever, args=(self.target_vel_queue, self.pose_queue)
+            target=debug_sever, args=(self.target_vel_queue, self.pose_queue, self.vel_queue)
         )
         self.process.start()
 
@@ -43,6 +49,7 @@ class DebugUI(py_trees.behaviour.Behaviour):
         chassis = Pose(Transform.identity(), "chassis", posetree).in_frame("field")
 
         self.pose_queue.put((chassis.x, chassis.y, chassis.rotation.as_euler("zyx")[0]))
+        self.vel_queue.put(self.blackboard.vel)
 
         return py_trees.common.Status.RUNNING
 

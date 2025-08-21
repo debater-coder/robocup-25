@@ -12,7 +12,7 @@ def serial_process(
 ):
     import serial
 
-    port = serial.Serial(dev, 115200)
+    port = serial.Serial(dev, 115200, write_timeout=0.5)
 
     # Reset port (^C^D)
     port.write(b"\x03\x04")
@@ -25,9 +25,11 @@ def serial_process(
         # send command (don't block on waiting for command)
         if not command_queue.empty():
             vx, vy, vw = command_queue.get()
-            port.write(f"{vx} {vy} {vw}\n".encode())
-            for i in range(50):
-                port.readline()
+            try:
+                port.write(f"{vx} {vy} {vw}\r\n".encode())
+                print("wrote", vx, vy, vw)
+            except:
+               pass
 
         # receive odom (MCU is spamming it anyway so ok to block)
         line = port.readline().decode()

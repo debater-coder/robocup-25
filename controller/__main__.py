@@ -53,4 +53,4 @@ def post_tick(tree):
 
 py_trees.blackboard.Blackboard.enable_activity_stream(maximum_size=100)
 tree = create_tree()
-tree.tick_tock(period_ms=16, post_tick_handler=post_tick)
+tree.tick_tock(period_ms=100, post_tick_handler=post_tick)
