@@ -4,6 +4,7 @@ import numpy as np
 from behaviours import VelocityControl
 from behaviours.debug_ui import DebugUI
 from behaviours.localisation import Localisation
+from behaviours.vision import Vision
 
 
 def create_root(debug: bool) -> py_trees.behaviour.Behaviour:
@@ -30,7 +31,7 @@ def create_root(debug: bool) -> py_trees.behaviour.Behaviour:
 
     # Data gathering (these all run in parallel on every tick)
     velocity_control = VelocityControl(name="Velocity Control")
-    vision = py_trees.behaviours.Running(name="Vision Processing")  # placeholder
+    vision = Vision(name="Vision Processing")  # placeholder
     localisation = Localisation(name="Localisation")
 
     root.add_children([velocity_control, vision, localisation])
