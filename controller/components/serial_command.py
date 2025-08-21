@@ -12,25 +12,34 @@ def serial_process(
 ):
     import serial
 
-    port = serial.Serial(dev, 115200)
+    port = serial.Serial(dev, 115200, write_timeout=0.5, timeout=0.02)
 
     # Reset port (^C^D)
+    print("Resetting...")
     port.write(b"\x03\x04")
-    for i in range(50):
-        port.readline()
+    port.flush()
+    port.reset_input_buffer()
+    print("Reset complete.")
 
     pending = ""
 
     while True:
-        # send command (don't block on waiting for command)
-        if not command_queue.empty():
-            vx, vy, vw = command_queue.get()
-            port.write(f"{vx} {vy} {vw}\n".encode())
-            for i in range(50):
-                port.readline()
+        try:
+            vx, vy, vw = command_queue.get_nowait()
+            data = f"{vx} {vy} {vw}\n".encode()
+            print(f"WRITE start data={data!r}")
+            port.write(data)
+            print("WRITE done")
+            port.flush()
+            print("FLUSH done")
+        except queue.Empty:
+            pass
+        except serial.SerialTimeoutException:
+            print("SerialTimeoutException on write/flush")
 
-        # receive odom (MCU is spamming it anyway so ok to block)
+        print("READ start")
         line = port.readline().decode()
+        print("READ done", line)
         if line:
             if line[-1] == "\n":
                 try:
@@ -82,7 +91,7 @@ class SerialCommand:
             except queue.Empty:
                 break
 
-        if item:
+        if item is not None:
             self.odometry = item
 
         return self.odometry
