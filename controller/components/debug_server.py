@@ -8,6 +8,7 @@ import asyncio
 def debug_sever(
     target_vel_queue: Queue[tuple[float, float, float]],
     current_pose: Queue[tuple[float, float, float]],
+    current_vel: Queue[tuple[float, float, float]],
 ):
     """
     Debug server running in a different process. Uses queues for communication.
@@ -46,6 +47,35 @@ def debug_sever(
         await ws.prepare(request)
 
         task = asyncio.create_task(send_current_pose(ws))
+
+        async for msg in ws:
+            if msg.type == WSMsgType.ERROR:
+                print("ws connection closed with exception %s" % ws.exception())
+
+        task.cancel()
+
+        return ws
+
+    async def send_current_vel(ws: web.WebSocketResponse):
+        def get_current_vel() -> tuple[float, float, float]:
+            return current_vel.get()
+
+        while True:
+            vx, vy, vw = await asyncio.to_thread(get_current_vel)
+            await ws.send_json(
+                {
+                    "vx": vx,
+                    "vy": vy,
+                    "vw": vw,
+                }
+            )
+
+    @routes.get("/vel")
+    async def vel(request: web.Request) -> web.WebSocketResponse:
+        ws = web.WebSocketResponse()
+        await ws.prepare(request)
+
+        task = asyncio.create_task(send_current_vel(ws))
 
         async for msg in ws:
             if msg.type == WSMsgType.ERROR:
