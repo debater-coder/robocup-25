@@ -1,6 +1,8 @@
 import numpy as np
 import time
 
+MAXSPEED = 0.060288
+
 
 class CommandMock:
     def __init__(self) -> None:
@@ -11,9 +13,9 @@ class CommandMock:
         self.last_time = time.time()
 
     def send_command(self, vx: float, vy: float, vw: float):
-        self.vx = min(1, max(-1, vx))
-        self.vy = min(1, max(-1, vy))
-        self.vw = min(1, max(-1, vw))
+        self.vx = min(MAXSPEED, max(-MAXSPEED, vx))
+        self.vy = min(MAXSPEED, max(-MAXSPEED, vy))
+        self.vw = min(MAXSPEED, max(-MAXSPEED, vw))
 
     def get_odometry(self):
         elapsed = time.time() - self.last_time

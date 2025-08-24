@@ -30,7 +30,13 @@ if args.render:
 def create_tree() -> py_trees.trees.BehaviourTree:
     tree = py_trees.trees.BehaviourTree(root)
 
-    command: SupportsCommand = CommandMock() if args.sim else SerialCommand()
+    command: SupportsCommand = CommandMock()
+
+    if not args.sim:
+        from components.pi_command import PiCommand
+
+        command = PiCommand()
+
     posetree = RobocupPoseTree()
 
     tree.setup(timeout=15, command=command, posetree=posetree)
