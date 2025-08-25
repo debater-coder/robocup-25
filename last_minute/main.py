@@ -1,4 +1,5 @@
-from typing import Literal
+# sudo apt install python3-opencv
+# sudo apt install python3-numpy
 from gpiozero import PhaseEnableMotor, Button, LED
 import cv2
 
