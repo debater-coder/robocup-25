@@ -1,8 +1,8 @@
 from typing import Literal
 from gpiozero import PhaseEnableMotor, Button, LED
-import cv2 as cv
+import cv2
 
-MAXSPEED = 0.060288
+kp = 0.001
 
 LX = 0.05  # half-length X between wheels
 LY = 0.05  # half-length Y between wheels
@@ -67,7 +67,7 @@ cyanUpper = (240, 255, 255)
 yellowLower = (50, 86, 30)
 yellowUpper = (65, 255, 255)
 
-cap = cv.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
@@ -111,7 +111,6 @@ while True:
         has_possession = False
 
         error = ball[0] - width / 2
-        kp = 0.001
 
         if abs(error) > 150:
             # rotate proportionally to error
@@ -131,16 +130,42 @@ while True:
 
         goal_mask = cv2.inRange(hsv, lower, upper)
 
-        pixels = cv2.count_pixels(goal_mask)
+        contours, _ = cv2.findContours(
+            mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
+
+        if len(contours) > 0:
+            c = max(contours, key=cv2.contourArea)
+
+            M = cv2.moments(c)
+
+            if M["m00"] != 0:
+                # centroid of mass
+                x = int(M["m10"] / M["m00"])
+
+                error = x - width / 2
+
+                if abs(error) > 100:
+                    # rotate proportionally to error
+                    set_speed(1, 0, kp * error)
+                else:
+                    set_speed(1, 0, 0)
+
+            else:
+                set_speed(0, 0, 1)
+        else:
+            # can't see any goal
+            #  so just spin
+            set_speed(0, 0, 1)
 
     else:
         # can't see ball, start spinnign
         set_speed(0, 0, 1)
 
-    cv.imshow("rotated", rotated)
-    if cv.waitKey(1) == ord("q"):
+    cv2.imshow("rotated", rotated)
+    if cv2.waitKey(1) == ord("q"):
         break
 
 
 cap.release()
-cv.destroyAllWindows()
+cv2.destroyAllWindows()
