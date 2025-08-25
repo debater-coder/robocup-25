@@ -101,7 +101,7 @@ while True:
         c = max(contours, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
 
-        if radius > 10:
+        if radius > 40:
             cv2.circle(rotated, (int(x), int(y)), int(radius), (0, 255, 255), 5)
             print("ball found", x, y)
             ball = (x, y)
@@ -111,17 +111,30 @@ while True:
         has_possession = False
 
         error = ball[0] - width / 2
-
         kp = 0.001
 
-        # rotate proportionally to error
-        set_speed(1, 0, kp * error)
+        if abs(error) > 150:
+            # rotate proportionally to error
+            set_speed(1, 0, kp * error)
+        else:
+            # go forward
+            set_speed(1, 0, 0)
+
+            if ball[1] > 3 / 4 * height:
+                # in possession zone:
+                has_possession = True
 
     elif has_possession:
-        # TODO: go to goal
-        ...
+        lower, upper = (
+            (yellowLower, yellowUpper) if goal == "yellow" else (cyanLower, cyanUpper)
+        )
+
+        goal_mask = cv2.inRange(hsv, lower, upper)
+
+        pixels = cv2.count_pixels(goal_mask)
+
     else:
-        # can't see ball
+        # can't see ball, start spinnign
         set_speed(0, 0, 1)
 
     cv.imshow("rotated", rotated)
