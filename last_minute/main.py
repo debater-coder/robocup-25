@@ -1,5 +1,5 @@
-from gpiozero import PhaseEnableMotor
-import numpy as np
+from typing import Literal
+from gpiozero import PhaseEnableMotor, Button, LED
 import cv2 as cv
 
 MAXSPEED = 0.060288
@@ -26,30 +26,105 @@ def forwards_kinematics(w1: float, w2: float, w3: float, w4: float):
     )
 
 
-rl = PhaseEnableMotor(17, 4, pwm=True)
+# motor gpio
+rl = PhaseEnableMotor(13, 6, pwm=True)
 fl = PhaseEnableMotor(22, 27, pwm=True)
-rr = PhaseEnableMotor(9, 10, pwm=True)
+rr = PhaseEnableMotor(10, 9, pwm=True)
 fr = PhaseEnableMotor(11, 5, pwm=True)
 
-orangeLower = np.array([20, 86, 6])
-orangeUpper = np.array([35, 255, 153])
+
+def set_speed(vx, vy, vw):
+    global rl
+    global fl
+    global rr
+    global fr
+    motors = [fl, fr, rl, rr]
+
+    values = inverse_kinematics(vx, vy, vw)
+    max_value = max(values, key=abs)
+
+    # scale values by max (phase_enable motor has range (1, -1))
+    values = [min(1, max(-1, value)) / max_value for value in values]
+
+    for motor, value in zip(motors, values):
+        motor.value = value
+
+
+# choose goal
+goal_button = Button(2)  # short 2 to ground for cyan goal, otherwise yellow goal
+
+# goal indicator LEDs (indicates active goal)
+cyan = LED(23)
+yellow = LED(24)
+
+# HSV values
+orangeLower = (20, 86, 30)
+orangeUpper = (35, 255, 255)
+
+cyanLower = (180, 86, 30)
+cyanUpper = (240, 255, 255)
+
+yellowLower = (50, 86, 30)
+yellowUpper = (65, 255, 255)
 
 cap = cv.VideoCapture(0)
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
-while True:
-    # Capture frame-by-frame
-    ret, frame = cap.read()
 
-    # if frame is read correctly ret is True
+has_possession = False
+
+while True:
+    ret, frame = cap.read()
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
         break
-    # Our operations on the frame come here
-    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    # Display the resulting frame
-    cv.imshow("frame", gray)
+    goal = "cyan" if goal_button.is_pressed else "yellow"
+    print("goal", goal)
+
+    rotated = cv2.rotate(frame, cv2.ROTATE_180)
+
+    # identify ball location
+    blurred = cv2.GaussianBlur(rotated, (11, 11), 0)
+    width, height = rotated.shape[:2]
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, orangeLower, orangeUpper)
+    mask = cv2.erode(mask, None, iterations=2)
+    mask = cv2.dilate(mask, None, iterations=2)
+    contours, _ = cv2.findContours(
+        mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
+
+    ball = None
+
+    if len(contours) > 0:
+        c = max(contours, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+
+        if radius > 10:
+            cv2.circle(rotated, (int(x), int(y)), int(radius), (0, 255, 255), 5)
+            print("ball found", x, y)
+            ball = (x, y)
+
+    # we see the ball
+    if ball:
+        has_possession = False
+
+        error = ball[0] - width / 2
+
+        kp = 0.001
+
+        # rotate proportionally to error
+        set_speed(1, 0, kp * error)
+
+    elif has_possession:
+        # TODO: go to goal
+        ...
+    else:
+        # can't see ball
+        set_speed(0, 0, 1)
+
+    cv.imshow("rotated", rotated)
     if cv.waitKey(1) == ord("q"):
         break
 
