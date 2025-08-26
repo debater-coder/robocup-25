@@ -75,6 +75,7 @@ yellowUpper = (65, 255, 255)
 
 cam = Picamera2()
 cam.start()
+set_speed(0, 0, 0)
 
 has_possession = False
 
